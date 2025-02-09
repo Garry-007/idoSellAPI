@@ -9,20 +9,21 @@ import {
 
 export const globalErrorHandler = (
   err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req?: Request,
+  res?: Response,
+  next?: NextFunction,
 ): void => {
   const errorResponse = getErrorResponse(err);
 
   // log every server error (5xx)
-  if (errorResponse.status >= 500 && errorResponse.status < 600) {
+  if ((errorResponse.status >= 500 && errorResponse.status < 600) || !res) {
     console.error('Server error:', err);
   }
 
-  const { status, ...body } = errorResponse;
-
-  res.status(errorResponse.status).json(body);
+  if (res) {
+    const { status, ...body } = errorResponse;
+    res.status(errorResponse.status).json(body);
+  }
 };
 
 const getErrorResponse = (err: any) => {

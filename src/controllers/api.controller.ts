@@ -3,7 +3,15 @@ import { orderIDSchema, orderQuerySchema } from '../validation';
 import prisma from '../db';
 import { OrderNotFoundError, OrdersNotFoundError } from '../errors';
 import { json2csv } from 'json-2-csv';
-import { IdoSellOrder } from '../services/orders.service';
+
+interface ApiOrderResponse {
+  orderID: string;
+  products: {
+    productID: number;
+    quantity: number;
+  }[];
+  orderWorth: number;
+}
 
 export const getAllOrdersCSV = async (req: Request, res: Response) => {
   const validatedQuery = orderQuerySchema.parse(req.query);
@@ -31,7 +39,7 @@ export const getAllOrdersCSV = async (req: Request, res: Response) => {
 
   // Format orders to the required structure
   // In the CSV export the 'products' field is a JSON string
-  const formattedOrders: IdoSellOrder[] = orders.map((order) => ({
+  const formattedOrders: ApiOrderResponse[] = orders.map((order) => ({
     orderID: order.orderID,
     orderWorth: order.orderWorth,
     products: order.products.map((p: any) => ({
@@ -61,7 +69,7 @@ export const getOrder = async (req: Request, res: Response) => {
     throw new OrderNotFoundError(`Order with ID "${orderID}" was not found`);
   }
 
-  const formattedOrder: IdoSellOrder = {
+  const formattedOrder: ApiOrderResponse = {
     orderID: order.orderID,
     orderWorth: order.orderWorth,
     products: order.products.map((p) => ({

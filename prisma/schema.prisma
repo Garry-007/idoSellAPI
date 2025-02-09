@@ -12,6 +12,7 @@ model Order {
   orderID    String       @unique
   orderWorth Float
   products   ProductSale[]
+  modifiedAt DateTime
   createdAt  DateTime     @default(now())
 }
 
